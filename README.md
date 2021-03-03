@@ -1,2 +1,2 @@
-# Niirty.Convert
+# Niirrty.Convert
 Some content converters
