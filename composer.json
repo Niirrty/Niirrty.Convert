@@ -1,0 +1,23 @@
+{
+    "name": "niirrty/niirrty.convert",
+    "type": "library",
+    "description": "Some Helper for converting things",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ni Irrty",
+            "email": "niirrty+code@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1",
+        "niirrty/niirrty.core": "~0.3",
+        "niirrty/niirrty.io": "~0.3",
+        "ext-mbstring": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Niirrty\\Convert\\": "src/"
+        }
+    }
+}
