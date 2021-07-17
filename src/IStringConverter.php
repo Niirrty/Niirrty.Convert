@@ -1,9 +1,11 @@
 <?php
 /**
- * @package Niirrty\Convert
- * @version 0.3.0
- * @since   03.03.2021
- * @author  Ulf Kadner (Xclirion) <ulf.kadner@xclirion.de>
+ * @author         Ni Irrty <niirrty+code@gmail.com>
+ * @copyright      © 2017-2021, Ni Irrty
+ * @package        Niirrty\Convert
+ * @license        MIT
+ * @since          2021-03-03
+ * @version        0.4.0
  */
 
 

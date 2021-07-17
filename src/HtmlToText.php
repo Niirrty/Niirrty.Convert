@@ -1,16 +1,18 @@
 <?php
 /**
- * @package Niirrty\Convert
- * @version 0.3.0
- * @since   03.03.2021
- * @author  Ulf Kadner (Xclirion) <ulf.kadner@xclirion.de>
+ * @author         Ni Irrty <niirrty+code@gmail.com>
+ * @copyright      © 2017-2021, Ni Irrty
+ * @package        Niirrty\Convert
+ * @license        MIT
+ * @since          2021-03-03
+ * @version        0.4.0
  */
 
 
 namespace Niirrty\Convert;
 
 
-use Niirrty\ArgumentException;
+use \Niirrty\ArgumentException;
 
 
 /**
@@ -33,28 +35,28 @@ class HtmlToText implements IHtmlConverter
      *
      * @var string
      */
-    private $url;
+    private string $url;
 
     /**
      * Contains the HTML content to convert.
      *
      * @var string
      */
-    private $html;
+    private string $html;
 
     /**
      * Contains the converted, formatted text.
      *
      * @var string
      */
-    private $text;
+    private string $text;
 
     /**
      * List of preg* regular expression patterns to search for, used in conjunction with $replace.
      *
      * @var array
      */
-    private $search = [
+    private array $search = [
         "/\r/",                                  // MAC linebreak carriage return
         "/[\n\t]+/",                             // Newlines and tabs
         '/<head[^>]*>.*?<\/head>/i',             // <head>
@@ -85,7 +87,7 @@ class HtmlToText implements IHtmlConverter
      * @var array
      * @see $search
      */
-    private $replace = [
+    private array $replace = [
         '',                                     // Non-legal carriage return
         ' ',                                    // Newlines and tabs
         '',                                     // <head>
@@ -115,7 +117,7 @@ class HtmlToText implements IHtmlConverter
      *
      * @var array
      */
-    private $entitiesSearch = [
+    private array $entitiesSearch = [
         '/&(nbsp|#160);/i',                      // Non-breaking space
         '/&(quot|rdquo|ldquo|#8220|#8221|#147|#148);/i', // Double quotes
         '/&(apos|rsquo|lsquo|#8216|#8217);/i',   // Single quotes
@@ -139,7 +141,7 @@ class HtmlToText implements IHtmlConverter
      * @var array
      * @see $ent_search
      */
-    private $entitiesReplace = [
+    private array $entitiesReplace = [
         ' ',                                    // Non-breaking space
         '"',                                    // Double quotes
         "'",                                    // Single quotes
@@ -162,7 +164,7 @@ class HtmlToText implements IHtmlConverter
      *
      * @var array
      */
-    private $callbackSearch = [
+    private const CALLBACK_SEARCH = [
         '/<(a) [^>]*href=("|\')([^"\']+)\2([^>]*)>(.*?)<\/a>/i', // <a href="">
         '/<(h)[123456]( [^>]*)?>(.*?)<\/h[123456]>/i',           // h1 - h6
         '/<(b)( [^>]*)?>(.*?)<\/b>/i',                           // <b>
@@ -177,7 +179,7 @@ class HtmlToText implements IHtmlConverter
      * @var array
      * @see $pre_replace
      */
-    private $preSearch = [
+    private array $preSearch = [
         "/\n/",
         "/\t/",
         '/ /',
@@ -191,7 +193,7 @@ class HtmlToText implements IHtmlConverter
      * @var array
      * @see $pre_search
      */
-    private $preReplace = [
+    private array $preReplace = [
         '<br>',
         '&nbsp;&nbsp;&nbsp;&nbsp;',
         '&nbsp;',
@@ -204,7 +206,7 @@ class HtmlToText implements IHtmlConverter
      *
      * @var string
      */
-    private $preContent = '';
+    private string $preContent = '';
 
     /**
      * Contains a list of HTML tags to allow in the resulting text.
@@ -212,28 +214,28 @@ class HtmlToText implements IHtmlConverter
      * @var string
      * @see set_allowed_tags()
      */
-    private $allowedElements = '';
+    private string $allowedElements = '';
 
     /**
      * Indicates whether content in the $html variable has been converted yet.
      *
      * @var bool|null
      */
-    private $converted;
+    private ?bool $converted;
 
     /**
      * Contains URL addresses from links to be rendered in plain text.
      *
      * @var array
      */
-    private $linkList = [ ];
+    private array $linkList = [ ];
 
     /**
      * Various configuration options (able to be set in the constructor)
      *
      * @var array
      */
-    private $options = [
+    private array $options = [
         'linkStyle'  => self::LINK_STYLE_INLINE,
         'lineLength' => 120,
     ];
@@ -298,7 +300,7 @@ class HtmlToText implements IHtmlConverter
             ? $linkStyle
             : self::LINK_STYLE_INLINE;
 
-        $this->options[ 'lineLength' ] = \intval( $lineLength );
+        $this->options[ 'lineLength' ] = $lineLength;
         if ( $this->options[ 'lineLength' ] < 45 )
         {
             $this->options[ 'lineLength' ] = 45;
@@ -351,10 +353,11 @@ class HtmlToText implements IHtmlConverter
     /**
      * Magic getter for dynamic property read access.
      *
-     * @param  string $name The property name
+     * @param string $name The property name
+     *
      * @return mixed Return type is depending to requested Property. If the property is undefined it returns FALSE.
      */
-    public function __get( $name )
+    public function __get( string $name )
     {
 
         if ( isset ( $this->options[ $name ] ) )
@@ -362,15 +365,12 @@ class HtmlToText implements IHtmlConverter
             return $this->options[ $name ];
         }
 
-        switch ( \strtolower( $name ) )
+        return match ( \strtolower( $name ) )
         {
-            case 'baseurl';
-                return $this->url;
-            case 'isconverted';
-                return null === $this->converted ? false : $this->converted;
-            default:
-                return false;
-        }
+            'baseurl'     => $this->url,
+            'isconverted' => null === $this->converted ? false : $this->converted,
+            default       => false,
+        };
 
     }
 
@@ -453,9 +453,10 @@ class HtmlToText implements IHtmlConverter
      *
      * @param string $name  The name of the dynamic property (caseless)
      * @param mixed  $value The new proerty value.
+     *
      * @throws ArgumentException Is thrown if a unknown property is used.
      */
-    public function __set( $name, $value )
+    public function __set( string $name, mixed $value )
     {
         switch ( \strtolower( $name ) )
         {
@@ -569,9 +570,10 @@ class HtmlToText implements IHtmlConverter
      * Callback function for preg_replace_callback use.
      *
      * @param array $matches PREG matches
+     *
      * @return string
      */
-    protected function pregCallback( $matches )
+    protected function pregCallback( array $matches ): string
     {
 
         switch ( \strtolower( $matches[ 1 ] ) )
@@ -609,12 +611,15 @@ class HtmlToText implements IHtmlConverter
      * Callback function for preg_replace_callback use in PRE content handler.
      *
      * @param array $matches PREG matches
+     *
      * @return string
+     * @noinspection PhpUnusedParameterInspection
      */
-    protected function pregPreCallback( /** @noinspection PhpUnusedParameterInspection */ $matches )
+    protected function pregPreCallback( array $matches ): string
     {
-        $matches = null;
+
         return $this->preContent;
+
     }
 
     #endregion
@@ -645,7 +650,7 @@ class HtmlToText implements IHtmlConverter
         $tmp = \preg_replace( $this->search, $this->replace, $text );
 
         // Run our defined tags search-and-replace with callback
-        $tmp = \preg_replace_callback( $this->callbackSearch, array( $this, 'pregCallback' ), $tmp );
+        $tmp = \preg_replace_callback( static::CALLBACK_SEARCH, array( $this, 'pregCallback' ), $tmp );
 
         // Strip any other HTML tags
         $tmp = \strip_tags( $tmp, $this->allowedElements );
@@ -688,9 +693,10 @@ class HtmlToText implements IHtmlConverter
      * appeared. Also makes an effort at identifying and handling absolute
      * and relative links.
      *
-     * @param  string $link URL of the link
-     * @param  string $display Part of the text to associate number with
-     * @param  string $link_override
+     * @param string      $link    URL of the link
+     * @param string      $display Part of the text to associate number with
+     * @param string|null $link_override
+     *
      * @return string
      */
     private function buildLinkList( string $link, string $display, string $link_override = null ) : string
@@ -765,8 +771,9 @@ class HtmlToText implements IHtmlConverter
             $this->preContent = $matches[ 1 ];
 
             // Run our defined tags search-and-replace with callback
+            /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
             $this->preContent = \preg_replace_callback(
-                $this->callbackSearch,
+                static::CALLBACK_SEARCH,
                 [ $this, 'pregCallback' ],
                 $this->preContent
             );
@@ -896,7 +903,7 @@ class HtmlToText implements IHtmlConverter
     private function strToUpper( string $str ) : string
     {
 
-        $str = \html_entity_decode( $str, \ENT_COMPAT );
+        $str = \html_entity_decode( $str );
 
         if ( \function_exists( '\\mb_strtoupper' ) )
         {
