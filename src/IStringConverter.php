@@ -27,7 +27,7 @@ interface IStringConverter extends IConverter
      * @return void
      * @throws
      */
-    public function setSource( string $source, bool $fromFile = false );
+    public function setSource( string $source, bool $fromFile = false ) : void;
 
     /**
      * Gets the convert result if converting was fine, otherwise the source is returned.

@@ -21,8 +21,8 @@ interface IHtmlConverter extends IStringConverter
      * Elements should be in the form "&lt;p&gt;&lt;spanp&gt;", or comma separated names "p, span" or a array
      * like array('&lt;p&gt;', '&lt;span&gt;') or array( 'p', 'span' ), with no corresponding closing tag.
      *
-     * @param string|array $allowedElements
+     * @param array|string $allowedElements
      */
-    public function setAllowedElements( $allowedElements = [] );
+    public function setAllowedElements( array|string $allowedElements = [] );
 
 }

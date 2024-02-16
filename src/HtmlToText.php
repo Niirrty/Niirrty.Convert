@@ -132,7 +132,7 @@ class HtmlToText implements IHtmlConverter
         '/&(pound|#163);/i',                     // Pound sign
         '/&(euro|#8364);/i',                     // Euro sign
         '/&(amp|#38);/i',                        // Ampersand: see _converter()
-        '/[ ]{2,}/',                             // Runs of spaces, post-handling
+        '/ {2,}/',                               // Runs of spaces, post-handling
     ];
 
     /**
@@ -165,7 +165,7 @@ class HtmlToText implements IHtmlConverter
      * @var array
      */
     private const CALLBACK_SEARCH = [
-        '/<(a) [^>]*href=("|\')([^"\']+)\2([^>]*)>(.*?)<\/a>/i', // <a href="">
+        '/<(a) [^>]*href=(["\'])([^"\']+)\2([^>]*)>(.*?)<\/a>/i', // <a href="">
         '/<(h)[123456]( [^>]*)?>(.*?)<\/h[123456]>/i',           // h1 - h6
         '/<(b)( [^>]*)?>(.*?)<\/b>/i',                           // <b>
         '/<(strong)( [^>]*)?>(.*?)<\/strong>/i',                 // <strong>
@@ -392,7 +392,7 @@ class HtmlToText implements IHtmlConverter
      * @param string  $source   The HTML source content
      * @param boolean $fromFile Indicates $source is a file path, to pull content from
      */
-    public function setSource( string $source, bool $fromFile = false )
+    public function setSource( string $source, bool $fromFile = false ) : void
     {
 
         if ( $fromFile && \file_exists( $source ) )
@@ -414,9 +414,9 @@ class HtmlToText implements IHtmlConverter
      * Elements should be in the form "&lt;p&gt;&lt;spanp&gt;", or comma separated names "p, span" or a array
      * like array('&lt;p&gt;', '&lt;span&gt;') or array( 'p', 'span' ), with no corresponding closing tag.
      *
-     * @param string|array $allowedElements
+     * @param array|string $allowedElements
      */
-    public function setAllowedElements( $allowedElements = [] )
+    public function setAllowedElements( array|string $allowedElements = [] ) : void
     {
 
         if ( empty( $allowedElements ) )
@@ -489,7 +489,7 @@ class HtmlToText implements IHtmlConverter
      *
      * @param string $url
      */
-    public function setBaseURL( string $url = '' )
+    public function setBaseURL( string $url = '' ) : void
     {
 
         if ( empty( $url ) )
@@ -507,7 +507,7 @@ class HtmlToText implements IHtmlConverter
         {
             // Strip any trailing slashes for consistency (relative
             // URLs may already start with a slash like "/file.html")
-            if ( '/' === \substr( $url, -1 ) )
+            if ( \str_ends_with( $url, '/' ) )
             {
                 $url = \substr( $url, 0, -1 );
             }
@@ -524,7 +524,7 @@ class HtmlToText implements IHtmlConverter
     /**
      * Prints the text, converted from HTML, to STDOUT.
      */
-    public function printResult()
+    public function printResult() : void
     {
         print $this->getText();
     }
@@ -637,7 +637,7 @@ class HtmlToText implements IHtmlConverter
      *
      * @param string $text Reference to HTML content string
      */
-    private function doConvert( string &$text )
+    private function doConvert( string &$text ) : void
     {
 
         // Convert <BLOCKQUOTE> (before PRE!)
@@ -670,7 +670,7 @@ class HtmlToText implements IHtmlConverter
 
         // Bring down number of empty lines to 2 max
         $tmp = \preg_replace( "/\n\s+\n/", "\n\n", $tmp );
-        $tmp = \preg_replace( "/[\n]{3,}/", "\n\n", $tmp );
+        $tmp = \preg_replace( "/\n{3,}/", "\n\n", $tmp );
 
         // remove leading empty lines (can be produced by eg. P tag on the beginning)
         $text = \ltrim( $tmp, "\n" );
@@ -727,7 +727,7 @@ class HtmlToText implements IHtmlConverter
         else
         {
             $url = $this->url;
-            if ( \substr( $link, 0, 1 ) != '/' )
+            if ( ! \str_starts_with( $link, '/' ) )
             {
                 $url .= '/';
             }
@@ -759,7 +759,7 @@ class HtmlToText implements IHtmlConverter
      *
      * @param string $text HTML content
      */
-    private function convertPre( string &$text )
+    private function convertPre( string &$text ) : void
     {
 
         $matches = null;
@@ -771,7 +771,6 @@ class HtmlToText implements IHtmlConverter
             $this->preContent = $matches[ 1 ];
 
             // Run our defined tags search-and-replace with callback
-            /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
             $this->preContent = \preg_replace_callback(
                 static::CALLBACK_SEARCH,
                 [ $this, 'pregCallback' ],
@@ -804,7 +803,7 @@ class HtmlToText implements IHtmlConverter
      *
      * @param string $text HTML content
      */
-    private function convertBlockquotes( string &$text )
+    private function convertBlockquotes( string &$text ) : void
     {
 
         if ( ! \preg_match_all( '/<\/*blockquote[^>]*>/i', $text, $matches, \PREG_OFFSET_CAPTURE ) )
@@ -878,7 +877,7 @@ class HtmlToText implements IHtmlConverter
     {
 
         // string can contain HTML tags
-        $chunks = \preg_split( '/(<[^>]*>)/', $str, null, \PREG_SPLIT_NO_EMPTY | \PREG_SPLIT_DELIM_CAPTURE );
+        $chunks = \preg_split( '/(<[^>]*>)/', $str, -1, \PREG_SPLIT_NO_EMPTY | \PREG_SPLIT_DELIM_CAPTURE );
 
         // convert to upper only the text between HTML tags
         foreach ( $chunks as $idx => $chunk )
