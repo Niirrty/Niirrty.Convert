@@ -593,7 +593,7 @@ class HtmlToText implements IHtmlConverter
                 // override the link method
                 $linkOverride = null;
                 $linkOverrideMatch = null;
-                if ( \preg_match( '/_html2text_link_(\w+)/', $matches[ 4 ], $linkOverrideMatch ) )
+                if ( \preg_match( '/_html2text_link_(\w+)/',  $matches[ 4 ], $linkOverrideMatch ) )
                 {
                     $linkOverride = $linkOverrideMatch[ 1 ];
                 }
